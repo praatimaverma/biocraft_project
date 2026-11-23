@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biocraft Scientific – Payment Follow-ups</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #eef2f1;
+      --surface: #ffffff;
+      --surface-2: #f6f8f7;
+      --ink: #14211f;
+      --ink-2: #52625f;
+      --line: #dfe6e4;
+      --brand: #0e6b5c;
+      --brand-ink: #ffffff;
+      --brand-soft: #dff1ec;
+      --blue: #2f5bd3;   --blue-soft: #e2e9fb;
+      --green: #12803f;  --green-soft: #dcf3e4;
+      --amber: #b86e00;  --amber-soft: #fcefd0;
+      --red: #c0391b;    --red-soft: #fbe3dc;
+      --violet: #6d45c9; --violet-soft: #ebe3fa;
+      --gray: #5d6b68;   --gray-soft: #e7ecea;
+      --shadow: 0 1px 2px rgba(20,33,31,.06), 0 8px 24px -12px rgba(20,33,31,.18);
+      --radius: 14px;
+      --display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+      --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0c1413; --surface: #131e1c; --surface-2: #182523;
+        --ink: #e6efed; --ink-2: #91a39f; --line: #243431;
+        --brand: #3cc2a5; --brand-ink: #062a22; --brand-soft: #173a33;
+        --blue: #8aa7ff; --blue-soft: #1c2748;
+        --green: #5fd08a; --green-soft: #15341f;
+        --amber: #f0b44c; --amber-soft: #3a2b0e;
+        --red: #ff8d72; --red-soft: #3d1d15;
+        --violet: #b69bff; --violet-soft: #2a2047;
+        --gray: #9fb0ac; --gray-soft: #22302d;
+        --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font: 15px/1.5 var(--body);
+    }
+    button, input, select { font: inherit; color: inherit; }
+    :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+    .shell { max-width: 1320px; margin: 0 auto; padding: 28px 28px 64px; }
+
+    /* ---------- Header ---------- */
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .mark {
+      width: 44px; height: 44px; border-radius: 12px; background: var(--brand); color: var(--brand-ink);
+      display: grid; place-items: center;
+    }
+    h1 { font: 700 26px/1.1 var(--display); letter-spacing: -.02em; margin: 0; }
+    .sub { margin: 2px 0 0; color: var(--ink-2); font-size: 14px; }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .live { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 13px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray); }
+    .live.on .dot { background: var(--green); box-shadow: 0 0 0 4px var(--green-soft); }
+
+    .btn {
+      border: 1px solid var(--line); background: var(--surface); border-radius: 10px;
+      padding: 8px 14px; cursor: pointer; font-weight: 500; transition: background .15s, border-color .15s;
+    }
+    .btn:hover { background: var(--surface-2); border-color: var(--ink-2); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+    .btn.primary:hover { filter: brightness(1.08); background: var(--brand); }
+    .btn.small { padding: 5px 10px; font-size: 13px; border-radius: 8px; }
+    .btn.ghost { background: transparent; }
+
+    /* ---------- KPI strip ---------- */
+    .kpis {
+      margin-top: 26px; display: grid; gap: 14px;
+      grid-template-columns: 1.5fr repeat(4, 1fr);
+    }
+    .kpi { background: var(--surface); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); min-width: 0; }
+    .kpi .label { color: var(--ink-2); font-size: 13px; }
+    .kpi .value { font: 700 30px/1.15 var(--display); letter-spacing: -.02em; margin-top: 6px; overflow-wrap: anywhere; }
+    .kpi .note { color: var(--ink-2); font-size: 12.5px; margin-top: 2px; }
+    .kpi.lead { background: var(--brand); color: var(--brand-ink); }
+    .kpi.lead .label, .kpi.lead .note { color: color-mix(in srgb, var(--brand-ink) 78%, transparent); }
+    .kpi.lead .value { font-size: 38px; }
+
+    /* ---------- Tabs ---------- */
+    .tabs { margin-top: 30px; display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+    .tab {
+      border: 0; background: none; padding: 10px 16px; cursor: pointer; font-weight: 600; color: var(--ink-2);
+      border-bottom: 3px solid transparent; margin-bottom: -1px; display: inline-flex; gap: 8px; align-items: center;
+    }
+    .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--brand); }
+    .count { background: var(--gray-soft); color: var(--ink-2); border-radius: 999px; padding: 0 8px; font-size: 12px; font-weight: 600; }
+    .tab[aria-selected="true"] .count { background: var(--brand-soft); color: var(--brand); }
+
+    /* ---------- Filters ---------- */
+    .filters {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin: 18px 0 14px;
+    }
+    .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .field > span { font-size: 12px; color: var(--ink-2); font-weight: 500; }
+    .field input, .field select {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; height: 38px;
+    }
+    .field.grow { flex: 1 1 280px; }
+    .field.grow input { width: 100%; }
+    .field input::placeholder { color: var(--ink-2); opacity: .8; }
+
+    /* ---------- Tables ---------- */
+    .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .table-wrapper { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 1080px; }
+    th {
+      text-align: left; font-weight: 600; font-size: 13px; color: var(--ink-2);
+      padding: 12px 16px; background: var(--surface-2); border-bottom: 1px solid var(--line); white-space: nowrap;
+    }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    /* The invoices table has one more column than before (Payment date): tighten
+       its side padding a little so the action buttons stay inside the panel. */
+    #panel-invoices th, #panel-invoices td { padding-left: 10px; padding-right: 10px; }
+    #panel-invoices th:first-child, #panel-invoices td:first-child { padding-left: 16px; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: var(--surface-2); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    /* status rail on the left of each ledger row */
+    tbody tr td:first-child { box-shadow: inset 4px 0 0 var(--rail, transparent); }
+    tr[data-tone="green"]  { --rail: var(--green); }
+    tr[data-tone="blue"]   { --rail: var(--blue); }
+    tr[data-tone="amber"]  { --rail: var(--amber); }
+    tr[data-tone="red"]    { --rail: var(--red); }
+    tr[data-tone="violet"] { --rail: var(--violet); }
+    tr[data-tone="gray"]   { --rail: var(--line); }
+
+    .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .avatar {
+      flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+      font-weight: 600; font-size: 13px; background: var(--brand-soft); color: var(--brand);
+    }
+    .who strong { display: block; font-weight: 600; }
+    .who small { color: var(--ink-2); }
+    .muted { color: var(--ink-2); }
+    .sec { display: block; font-size: 12.5px; color: var(--ink-2); }
+    .sec.late { color: var(--red); font-weight: 500; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+      font-size: 12.5px; font-weight: 600; white-space: nowrap; background: var(--gray-soft); color: var(--gray);
+    }
+    .badge.green  { background: var(--green-soft);  color: var(--green); }
+    .badge.blue   { background: var(--blue-soft);   color: var(--blue); }
+    .badge.amber  { background: var(--amber-soft);  color: var(--amber); }
+    .badge.red    { background: var(--red-soft);    color: var(--red); }
+    .badge.violet { background: var(--violet-soft); color: var(--violet); }
+    .badge.pulse::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { opacity: .25; } }
+    .tag { font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; }
+
+    .actions { display: flex; gap: 8px; justify-content: flex-end; white-space: nowrap; }
+
+    .empty { padding: 56px 24px; text-align: center; color: var(--ink-2); }
+    .empty h3 { margin: 0 0 6px; color: var(--ink); font: 700 18px var(--display); }
+    .empty code { background: var(--surface-2); padding: 1px 6px; border-radius: 5px; }
+    .more { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--line); color: var(--ink-2); font-size: 13.5px; }
+
+    /* a newly added call announces itself once */
+    tr.fresh td { animation: fresh 2.4s ease-out; }
+    @keyframes fresh { from { background: var(--amber-soft); } to { background: transparent; } }
+
+    /* ---------- Drawer ---------- */
+    .scrim { position: fixed; inset: 0; background: rgba(8,16,14,.55); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 50; }
+    .scrim.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: min(620px, 100%); background: var(--surface);
+      transform: translateX(100%); transition: transform .25s ease; z-index: 60; display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: none; box-shadow: -20px 0 50px -20px rgba(0,0,0,.35); }
+    .drawer-head { padding: 22px 24px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; }
+    .drawer-head h2 { margin: 0; font: 700 21px/1.2 var(--display); letter-spacing: -.01em; }
+    .drawer-head p { margin: 2px 0 0; color: var(--ink-2); }
+    .x { border: 0; background: var(--surface-2); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; flex: none; }
+    .drawer-body { padding: 20px 24px 32px; overflow-y: auto; flex: 1; }
+    .msg { color: var(--ink-2); margin: 0 0 12px; }
+    .msg.error { color: var(--red); }
+
+    .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin: 0 0 22px; }
+    .facts div { min-width: 0; }
+    .facts dt { font-size: 12.5px; color: var(--ink-2); }
+    .facts dd { margin: 2px 0 0; font-weight: 500; overflow-wrap: anywhere; }
+    .facts .wide { grid-column: 1 / -1; }
+    h3.h { font: 700 16px var(--display); margin: 24px 0 10px; }
+
+    .chat { background: var(--surface-2); border-radius: 12px; padding: 14px; max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .bubble { max-width: 86%; padding: 8px 12px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--surface); border: 1px solid var(--line); }
+    .bubble.agent { align-self: flex-start; border-bottom-left-radius: 4px; }
+    .bubble.user { align-self: flex-end; background: var(--brand-soft); border-color: transparent; border-bottom-right-radius: 4px; }
+    .bubble.plain { max-width: 100%; align-self: stretch; }
+    audio { width: 100%; margin-top: 8px; }
+
+    .timeline { list-style: none; margin: 0; padding: 0; }
+    .timeline li { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+    .timeline li:last-child { border-bottom: 0; }
+    .timeline li:hover { color: var(--brand); }
+    .timeline .when { flex: 1; min-width: 0; }
+
+    /* ---------- Toasts ---------- */
+    .toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 100; width: min(440px, calc(100% - 32px)); }
+    .toast { background: var(--ink); color: var(--bg); padding: 12px 16px; border-radius: 12px; box-shadow: var(--shadow); font-weight: 500; }
+    .toast.error { background: var(--red); color: #fff; }
+
+    @media (max-width: 1000px) { .kpis { grid-template-columns: 1fr 1fr; } .kpi.lead { grid-column: 1 / -1; } }
+    @media (max-width: 650px) {
+      .shell { padding: 16px 16px 48px; }
+      h1 { font-size: 22px; }
+      .facts { grid-template-columns: 1fr; }
+      .field { flex: 1 1 140px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="shell">
+
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6.2L4.6 18.6A1.6 1.6 0 0 0 6 21h12a1.6 1.6 0 0 0 1.4-2.4L14 9.2V3"/><path d="M7.4 15h9.2"/></svg>
+      </div>
+      <div>
+        <h1>Biocraft Scientific</h1>
+        <p class="sub">Payment follow-ups: overdue invoices and every call made on them</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="live" id="live"><span class="dot"></span><span id="liveText">Connecting…</span></span>
+      <button class="btn" id="refreshBtn" type="button">Refresh</button>
+    </div>
+  </header>
+
+  <section class="kpis" aria-label="Summary">
+    <div class="kpi lead"><div class="label">Still to collect</div><div class="value" id="kpiOutstanding">—</div><div class="note" id="kpiOutstandingNote">&nbsp;</div></div>
+    <div class="kpi"><div class="label">Calls logged</div><div class="value" id="kpiCalls">—</div><div class="note" id="kpiCallsNote">&nbsp;</div></div>
+    <div class="kpi"><div class="label">Payment pending</div><div class="value" id="kpiPending">—</div><div class="note">invoices</div></div>
+    <div class="kpi"><div class="label">Payment done</div><div class="value" id="kpiDone">—</div><div class="note">invoices</div></div>
+    <div class="kpi"><div class="label">Payment unclear</div><div class="value" id="kpiUnclear">—</div><div class="note">needs a human look</div></div>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-invoices" aria-selected="true" data-tab="invoices">Invoices <span class="count" id="countInvoices">0</span></button>
+    <button class="tab" role="tab" id="tab-calls" aria-selected="false" data-tab="calls">Call history <span class="count" id="countCalls">0</span></button>
+  </div>
+
+  <!-- ===== Invoices ===== -->
+  <section id="panel-invoices" role="tabpanel" aria-labelledby="tab-invoices">
+    <div class="filters">
+      <label class="field grow"><span>Search</span><input id="invSearch" type="search" placeholder="Customer name or phone number"></label>
+      <label class="field"><span>Payment status</span>
+        <select id="invState"><option value="">All</option><option value="pending">Pending</option><option value="done">Done</option><option value="unclear">Unclear</option></select>
+      </label>
+      <label class="field"><span>Payment mode</span>
+        <select id="invMode"><option value="">All modes</option><option value="UPI">UPI</option><option value="Bank transfer">Bank transfer</option><option value="Cheque">Cheque</option><option value="Cash">Cash</option><option value="Card">Card</option><option value="Other">Other</option></select>
+      </label>
+      <label class="field"><span>Last call result</span><select id="invStatus"><option value="">All results</option></select></label>
+      <label class="field"><span>Due from</span><input id="invFrom" type="date"></label>
+      <label class="field"><span>Due to</span><input id="invTo" type="date"></label>
+      <button class="btn ghost" id="invClear" type="button">Clear filters</button>
+    </div>
+
+    <div class="panel">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th class="num">Amount</th>
+              <th>Due</th>
+              <th>Payment status</th>
+              <th>Payment mode</th>
+              <th>Last call result</th>
+              <th>Promised date</th>
+              <th>Payment date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div id="invEmpty" class="empty" hidden></div>
+    </div>
+  </section>
+
+  <!-- ===== Call history ===== -->
+  <section id="panel-calls" role="tabpanel" aria-labelledby="tab-calls" hidden>
+    <div class="filters">
+      <label class="field grow"><span>Search</span><input id="callSearch" type="search" placeholder="Customer, phone, call ID, dispute reason or transcript"></label>
+      <label class="field"><span>Outcome</span>
+        <select id="callOutcome">
+          <option value="">All outcomes</option>
+          <option value="promised_to_pay">Promised to pay</option>
+          <option value="Payment Done">Payment done</option>
+          <option value="disputed">Disputed</option>
+          <option value="refused">Refused</option>
+          <option value="callback_requested">Callback requested</option>
+          <option value="wrong_number">Wrong number</option>
+          <option value="pending">Pending</option>
+        </select>
+      </label>
+      <label class="field"><span>Payment status</span>
+        <select id="callState"><option value="">All</option><option value="pending">Pending</option><option value="done">Done</option><option value="unclear">Unclear</option></select>
+      </label>
+      <label class="field"><span>Payment mode</span>
+        <select id="callMode"><option value="">All modes</option><option value="UPI">UPI</option><option value="Bank transfer">Bank transfer</option><option value="Cheque">Cheque</option><option value="Cash">Cash</option><option value="Card">Card</option><option value="Other">Other</option></select>
+      </label>
+      <label class="field"><span>Call status</span>
+        <select id="callStatus">
+          <option value="">Any status</option>
+          <option value="calling">Calling</option>
+          <option value="completed">Completed</option>
+          <option value="no-answer">No answer</option>
+          <option value="busy">Busy</option>
+          <option value="failed">Failed</option>
+        </select>
+      </label>
+      <label class="field"><span>Started by</span>
+        <select id="callSource">
+          <option value="">Anyone</option>
+          <option value="manual">Manual</option>
+          <option value="auto">Automatic</option>
+          <option value="imported">Imported</option>
+        </select>
+      </label>
+      <label class="field"><span>From</span><input id="callFrom" type="date"></label>
+      <label class="field"><span>To</span><input id="callTo" type="date"></label>
+      <label class="field"><span>Sort</span>
+        <select id="callSort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select>
+      </label>
+      <button class="btn ghost" id="callClear" type="button">Clear filters</button>
+    </div>
+
+    <div class="panel">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Called</th>
+              <th>Customer</th>
+              <th class="num">Amount</th>
+              <th>Call status</th>
+              <th>Outcome</th>
+              <th>Payment status</th>
+              <th>Payment mode</th>
+              <th>Promised date</th>
+              <th>Started by</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="callRows"></tbody>
+        </table>
+      </div>
+      <div id="callEmpty" class="empty" hidden></div>
+      <div class="more" id="callMore" hidden>
+        <span id="callShowing"></span>
+        <button class="btn" id="loadMore" type="button">Load more</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== Details drawer ===== -->
+<div id="detailsBackdrop" class="scrim"></div>
+<aside id="drawer" class="drawer" aria-hidden="true" aria-labelledby="detailsTitle">
+  <div class="drawer-head">
+    <div>
+      <h2 id="detailsTitle">Call Details</h2>
+      <p id="detailsSubtitle"></p>
+    </div>
+    <button id="closeDetails" class="x" type="button" aria-label="Close">✕</button>
+  </div>
+  <div class="drawer-body">
+    <p id="detailsMessage" class="msg"></p>
+
+    <dl class="facts">
+      <div><dt>Call result</dt><dd id="detailStatus">—</dd></div>
+      <div><dt>Payment status</dt><dd id="detailState">—</dd></div>
+      <div><dt>Payment mode</dt><dd id="detailMode">—</dd></div>
+      <div><dt>Promised payment date</dt><dd id="detailDate">—</dd></div>
+      <div><dt>Actual payment date</dt><dd id="detailPaymentDate">—</dd></div>
+      <div><dt>Call ID</dt><dd id="detailCallId">—</dd></div>
+      <div><dt>Dispute reason</dt><dd id="detailDispute">—</dd></div>
+    </dl>
+
+    <h3 class="h">Full chat / transcript</h3>
+    <div id="detailTranscript" class="chat"><div class="bubble plain">No transcript loaded.</div></div>
+
+    <h3 class="h">Call recording</h3>
+    <p id="recordingMessage" class="msg">No recording loaded.</p>
+    <audio id="detailAudio" controls preload="none" hidden></audio>
+
+    <div id="historyBlock" hidden>
+      <h3 class="h">All calls for this invoice</h3>
+      <ul id="historyList" class="timeline"></ul>
+    </div>
+  </div>
+</aside>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  /* ================= helpers ================= */
+  const $ = (id) => document.getElementById(id);
+  const tbody = $('rows');
+  const callRows = $('callRows');
+  const audioPlayer = $('detailAudio');
+  const PAGE = 25;
+
+  const state = {
+    invoices: [],
+    calls: [],
+    callTotal: 0,
+    callsConfigured: true,
+    seenCallIds: null,      // null until first load, so old rows don't flash
+    callLoadToken: 0
+  };
+
+  function el(tag, props = {}, ...kids) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k === 'class') node.className = v;
+      else if (k === 'dataset') Object.assign(node.dataset, v);
+      else if (k === 'text') node.textContent = v;
+      else node.setAttribute(k, v);
+    }
+    for (const kid of kids) if (kid != null) node.append(kid);
+    return node;
+  }
+
+  const money = (n) => '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+
+  function parseDay(text) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(text || '');
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  }
+  function fmtDay(text) {
+    const d = parseDay(text);
+    return d ? d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : (text || '—');
+  }
+  function fmtStamp(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+  function ago(iso) {
+    if (!iso) return '';
+    const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + ' min ago';
+    if (s < 86400) return Math.floor(s / 3600) + ' h ago';
+    if (s < 86400 * 7) return Math.floor(s / 86400) + ' d ago';
+    return '';
+  }
+  function pretty(v) {
+    const t = String(v || '').replace(/[_-]+/g, ' ').trim();
+    return t ? t.charAt(0).toUpperCase() + t.slice(1) : '—';
+  }
+  function initials(name) {
+    const p = String(name || '?').trim().split(/\s+/);
+    return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
+  }
+
+  // colour for a status / outcome
+  function toneOf(value) {
+    const v = String(value || 'pending').toLowerCase().replace(/[\s-]+/g, '_');
+    if (['paid', 'paid_on_call', 'payment_done'].includes(v)) return 'green';
+    if (v === 'promised_to_pay') return 'blue';
+    if (v === 'calling') return 'amber';
+    if (['disputed', 'refused', 'wrong_number', 'failed', 'error', 'canceled', 'cancelled', 'stopped', 'balance_low'].includes(v)) return 'red';
+    if (v === 'callback_requested') return 'violet';
+    return 'gray';
+  }
+  function badge(value) {
+    const tone = toneOf(value);
+    const v = String(value || 'pending').toLowerCase();
+    return el('span', { class: 'badge ' + (tone === 'gray' ? '' : tone) + (v === 'calling' ? ' pulse' : ''), text: pretty(value || 'pending') });
+  }
+
+  // payment status: done = green, pending = amber, unclear = violet
+  const STATE_TONE = { done: 'green', pending: 'amber', unclear: 'violet' };
+  const stateTone = (v) => STATE_TONE[String(v || 'pending').toLowerCase()] || 'gray';
+  function stateBadge(v) {
+    const k = String(v || 'pending').toLowerCase();
+    return el('span', { class: 'badge ' + (STATE_TONE[k] || ''), text: pretty(k) });
+  }
+  // Older data may hold 'Not specified' or 'Bank Transfer'; show/filter it with today's labels.
+  function cleanMode(m) {
+    const t = String(m || '').trim();
+    if (!t || /^(not specified|unknown|none|null)$/i.test(t)) return '';
+    return /^bank transfer$/i.test(t) ? 'Bank transfer' : t;
+  }
+  const modeCell = (m) => { const v = cleanMode(m); return el('td', { class: v ? '' : 'muted', text: v || '—' }); };
+
+  function toast(message, isError) {
+    const t = el('div', { class: 'toast' + (isError ? ' error' : ''), text: message });
+    $('toasts').appendChild(t);
+    setTimeout(() => t.remove(), 5000);
+  }
+
+  async function getJson(url) {
+    const res = await fetch(url);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  }
+  const debounce = (fn, ms = 280) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+
+  /* ================= invoices ================= */
+  async function loadInvoices() {
+    try {
+      state.invoices = await getJson('/api/invoices');
+      renderInvoices();
+      renderKpis();
+    } catch (error) {
+      console.error(error);
+      toast('Could not load invoices. Check the server terminal.', true);
+    }
+  }
+
+  function filteredInvoices() {
+    const q = $('invSearch').value.trim().toLowerCase();
+    const status = $('invStatus').value;
+    const payState = $('invState').value;
+    const mode = $('invMode').value;
+    const from = $('invFrom').value;
+    const to = $('invTo').value;
+    return state.invoices.filter((inv) => {
+      if (q && !(`${inv.customer_name} ${inv.phone_number}`.toLowerCase().includes(q))) return false;
+      if (status && String(inv.payment_status || 'pending') !== status) return false;
+      if (payState && String(inv.payment_state || 'pending') !== payState) return false;
+      if (mode && cleanMode(inv.payment_mode) !== mode) return false;
+      if (from && String(inv.due_date) < from) return false;
+      if (to && String(inv.due_date) > to) return false;
+      return true;
+    });
+  }
+
+  function refreshStatusOptions() {
+    const select = $('invStatus');
+    const current = select.value;
+    const values = [...new Set(state.invoices.map((i) => i.payment_status || 'pending'))].sort();
+    select.replaceChildren(el('option', { value: '', text: 'All results' }),
+      ...values.map((v) => el('option', { value: v, text: pretty(v) })));
+    select.value = values.includes(current) ? current : '';
+  }
+
+  function daysLate(due) {
+    const d = parseDay(due);
+    if (!d) return 0;
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return Math.round((t - d) / 86400000);
+  }
+
+  function renderInvoices() {
+    refreshStatusOptions();
+    const list = filteredInvoices();
+    tbody.replaceChildren();
+
+    for (const inv of list) {
+      const row = el('tr', { dataset: { tone: stateTone(inv.payment_state) } });
+      const paid = inv.payment_state === 'done';
+      const late = daysLate(inv.due_date);
+
+      row.append(
+        el('td', {}, el('div', { class: 'who' },
+          el('span', { class: 'avatar', text: initials(inv.customer_name) }),
+          el('div', {}, el('strong', { text: inv.customer_name || '' }), el('small', { text: inv.phone_number || '' })))),
+        el('td', { class: 'num', text: money(inv.amount_due) }),
+        el('td', {}, fmtDay(inv.due_date),
+          !paid && late > 0 ? el('span', { class: 'sec late', text: late + (late === 1 ? ' day overdue' : ' days overdue') }) : null),
+        el('td', {}, stateBadge(inv.payment_state)),
+        modeCell(inv.payment_mode),
+        el('td', {}, inv.last_call_id ? badge(inv.payment_status || 'pending') : el('span', { class: 'muted', text: 'Not called yet' })),
+        el('td', { class: inv.promised_pay_date ? '' : 'muted' },
+          inv.promised_pay_date ? fmtDay(inv.promised_pay_date) : '—',
+          inv.promised_pay_date && !paid
+            ? el('span', { class: 'sec', text: daysLate(inv.promised_pay_date) > 0 ? 'Follow-up due' : 'Calls at 10 AM and 5 PM' })
+            : null),
+        el('td', { class: inv.payment_date ? '' : 'muted', text: inv.payment_date ? fmtDay(inv.payment_date) : '—' })
+      );
+
+      const actions = el('td', {}, el('div', { class: 'actions' },
+        el('button', { class: 'btn small', type: 'button', text: 'Details', dataset: { action: 'details', id: inv.id } }),
+        el('button', { class: 'btn small primary', type: 'button', text: 'Start follow-up call', dataset: { action: 'call', id: inv.id } })));
+      row.appendChild(actions);
+      tbody.appendChild(row);
+    }
+
+    $('countInvoices').textContent = state.invoices.length;
+    const empty = $('invEmpty');
+    empty.hidden = list.length > 0;
+    if (!list.length) {
+      empty.replaceChildren(
+        el('h3', { text: state.invoices.length ? 'No invoices match these filters' : 'No invoices yet' }),
+        el('div', { text: state.invoices.length ? 'Try a different name or clear the filters.' : 'Invoices added to the database will show up here.' }));
+    }
+  }
+
+  function renderKpis() {
+    const open = state.invoices.filter((i) => i.payment_state !== 'done');
+    const total = open.reduce((sum, i) => sum + Number(i.amount_due || 0), 0);
+    const overdue = open.filter((i) => daysLate(i.due_date) > 0).length;
+    $('kpiOutstanding').textContent = money(total);
+    $('kpiOutstandingNote').textContent = open.length + (open.length === 1 ? ' unpaid invoice' : ' unpaid invoices') + ' · ' + overdue + ' overdue';
+    const count = (k) => state.invoices.filter((i) => (i.payment_state || 'pending') === k).length;
+    $('kpiPending').textContent = count('pending');
+    $('kpiDone').textContent = count('done');
+    $('kpiUnclear').textContent = count('unclear');
+  }
+
+  async function loadStats() {
+    try {
+      const s = await getJson('/api/call-logs/stats');
+      state.callsConfigured = s.configured;
+      $('kpiCalls').textContent = s.configured ? s.total : '—';
+      $('kpiCallsNote').textContent = s.configured ? s.today + ' today' : 'Supabase not set up';
+      $('countCalls').textContent = s.configured ? s.total : 0;
+    } catch (e) {
+      $('kpiCalls').textContent = '—';
+      $('kpiCallsNote').textContent = 'Could not reach Supabase';
+    }
+  }
+
+  /* ================= call history ================= */
+  function callParams(offset, limit) {
+    const p = new URLSearchParams();
+    const add = (k, v) => { if (v) p.set(k, v); };
+    add('q', $('callSearch').value.trim());
+    add('outcome', $('callOutcome').value);
+    add('payment_state', $('callState').value);
+    add('payment_mode', $('callMode').value);
+    add('call_status', $('callStatus').value);
+    add('source', $('callSource').value);
+    add('from', $('callFrom').value);
+    add('to', $('callTo').value);
+    add('sort', $('callSort').value);
+    p.set('limit', limit);
+    p.set('offset', offset);
+    return p;
+  }
+
+  // reload = true: start again from the newest page (used by filters and live updates)
+  async function loadCalls({ reload = true, live = false } = {}) {
+    const token = ++state.callLoadToken;
+    const offset = reload ? 0 : state.calls.length;
+    // on a live refresh keep as many rows on screen as the person already loaded
+    const limit = reload ? Math.max(PAGE, state.calls.length) : PAGE;
+
+    try {
+      const data = await getJson('/api/call-logs?' + callParams(offset, limit));
+      if (token !== state.callLoadToken) return;   // a newer request replaced this one
+
+      state.callsConfigured = data.configured !== false;
+      const incoming = data.rows || [];
+      const previouslySeen = live ? state.seenCallIds : null;   // only live updates flash new rows
+      state.calls = reload ? incoming : state.calls.concat(incoming);
+      state.callTotal = data.total || 0;
+      renderCalls(previouslySeen);
+      if (!state.seenCallIds) state.seenCallIds = new Set();
+      state.calls.forEach((c) => state.seenCallIds.add(c.id));
+    } catch (error) {
+      console.error(error);
+      if (token === state.callLoadToken) showCallsMessage('Could not load call history', 'Check that Supabase is reachable and the service key in .env is correct.');
+    }
+  }
+
+  function showCallsMessage(title, body) {
+    callRows.replaceChildren();
+    $('callMore').hidden = true;
+    const e = $('callEmpty');
+    e.hidden = false;
+    e.replaceChildren(el('h3', { text: title }), el('div', { text: body }));
+  }
+
+  function renderCalls(previouslySeen) {
+    if (!state.callsConfigured) {
+      const e = $('callEmpty');
+      callRows.replaceChildren();
+      $('callMore').hidden = true;
+      e.hidden = false;
+      e.replaceChildren(
+        el('h3', { text: 'Connect Supabase to see call history' }),
+        el('div', {}, 'Add ', el('code', { text: 'SUPABASE_URL' }), ' and ', el('code', { text: 'SUPABASE_SERVICE_KEY' }), ' to your .env file, run ',
+          el('code', { text: 'supabase_schema.sql' }), ' in Supabase, then restart the server.'));
+      return;
+    }
+
+    callRows.replaceChildren();
+    for (const c of state.calls) {
+      const fresh = previouslySeen && !previouslySeen.has(c.id);
+      const row = el('tr', { dataset: { tone: c.call_status === 'calling' ? 'amber' : stateTone(c.payment_state) }, class: fresh ? 'fresh' : '' });
+      const rel = ago(c.called_at);
+
+      row.append(
+        el('td', {}, fmtStamp(c.called_at), rel ? el('span', { class: 'sec', text: rel }) : null),
+        el('td', {}, el('div', { class: 'who' },
+          el('span', { class: 'avatar', text: initials(c.customer_name) }),
+          el('div', {}, el('strong', { text: c.customer_name || 'Unknown' }), el('small', { text: c.phone_number || '' })))),
+        el('td', { class: 'num', text: c.amount_due != null ? money(c.amount_due) : '—' }),
+        el('td', {}, badge(c.call_status || 'calling')),
+        el('td', {}, c.outcome ? badge(c.outcome) : el('span', { class: 'muted', text: '—' })),
+        el('td', {}, c.call_status === 'calling' ? el('span', { class: 'muted', text: '—' }) : stateBadge(c.payment_state)),
+        modeCell(c.payment_mode),
+        el('td', { class: c.promised_pay_date ? '' : 'muted', text: c.promised_pay_date ? fmtDay(c.promised_pay_date) : '—' }),
+        el('td', {}, el('span', { class: 'tag', text: pretty(c.trigger_source) })),
+        el('td', {}, el('div', { class: 'actions' },
+          el('button', { class: 'btn small', type: 'button', text: 'View call', dataset: { action: 'view-call', id: c.id } })))
+      );
+      callRows.appendChild(row);
+    }
+
+    const none = state.calls.length === 0;
+    const e = $('callEmpty');
+    e.hidden = !none;
+    if (none) {
+      const filtered = callFiltersActive();
+      e.replaceChildren(
+        el('h3', { text: filtered ? 'No calls match these filters' : 'No calls recorded yet' }),
+        el('div', { text: filtered ? 'Try a different name or clear the filters.' : 'Start a follow-up call from the Invoices tab and it will appear here.' }));
+    }
+
+    $('callMore').hidden = none;
+    $('callShowing').textContent = `Showing ${state.calls.length} of ${state.callTotal} calls`;
+    $('loadMore').hidden = state.calls.length >= state.callTotal;
+  }
+
+  const callFilterIds = ['callSearch', 'callOutcome', 'callState', 'callMode', 'callStatus', 'callSource', 'callFrom', 'callTo'];
+  const callFiltersActive = () => callFilterIds.some((id) => $(id).value);
+
+  /* ================= details drawer ================= */
+  function openDrawer() {
+    $('detailsBackdrop').classList.add('open');
+    $('drawer').classList.add('open');
+    $('drawer').setAttribute('aria-hidden', 'false');
+  }
+  function closeDrawer() {
+    $('detailsBackdrop').classList.remove('open');
+    $('drawer').classList.remove('open');
+    $('drawer').setAttribute('aria-hidden', 'true');
+    audioPlayer.pause();
+  }
+
+  function resetDrawer(subtitle) {
+    $('detailsTitle').textContent = 'Call Details';
+    $('detailsSubtitle').textContent = subtitle;
+    const msg = $('detailsMessage');
+    msg.textContent = 'Loading details...';
+    msg.className = 'msg';
+    ['detailStatus', 'detailState', 'detailMode', 'detailDate', 'detailPaymentDate', 'detailCallId', 'detailDispute'].forEach((id) => { $(id).textContent = '—'; });
+    $('detailTranscript').replaceChildren(el('div', { class: 'bubble plain', text: 'Loading transcript...' }));
+    audioPlayer.pause();
+    audioPlayer.removeAttribute('src');
+    audioPlayer.load();
+    audioPlayer.hidden = true;
+    $('recordingMessage').textContent = 'Checking recording...';
+    $('historyBlock').hidden = true;
+  }
+
+  function renderTranscript(text) {
+    const box = $('detailTranscript');
+    box.replaceChildren();
+    if (!text) {
+      box.append(el('div', { class: 'bubble plain', text: 'No transcript saved yet. The completed call webhook must provide the transcript.' }));
+      return;
+    }
+    const lines = String(text).split(/\n+/).filter(Boolean);
+    const speaker = /^\s*(assistant|agent|bot|ai|user|customer|human)\s*:\s*/i;
+    if (!lines.some((l) => speaker.test(l))) {
+      box.append(el('div', { class: 'bubble plain', text: String(text) }));
+      return;
+    }
+    let last = null;
+    for (const line of lines) {
+      const m = speaker.exec(line);
+      if (m) {
+        const isAgent = /assistant|agent|bot|ai/i.test(m[1]);
+        last = el('div', { class: 'bubble ' + (isAgent ? 'agent' : 'user'), text: line.replace(speaker, '') });
+        box.append(last);
+      } else if (last) {
+        last.textContent += '\n' + line;
+      } else {
+        box.append(el('div', { class: 'bubble plain', text: line }));
+      }
+    }
+  }
+
+  function fillDetails(d, { statusLabel, sub }) {
+    $('detailsTitle').textContent = (d.customer_name || 'Customer') + ' — Call Details';
+    $('detailsSubtitle').textContent = sub;
+    $('detailsMessage').textContent = '';
+    $('detailStatus').replaceChildren(statusLabel);
+    $('detailState').replaceChildren(stateBadge(d.payment_state));
+    $('detailMode').textContent = cleanMode(d.payment_mode) || 'Not mentioned';
+    $('detailDate').textContent = d.promised_pay_date ? fmtDay(d.promised_pay_date) : 'Not recorded';
+    $('detailPaymentDate').textContent = d.payment_date ? fmtDay(d.payment_date) : 'Not recorded';
+    $('detailCallId').textContent = d.call_id || d.last_call_id || 'No call ID saved';
+    $('detailDispute').textContent = d.dispute_reason || 'None recorded';
+    renderTranscript(d.transcript || d.last_transcript);
+    const rec = d.recording_url || d.last_recording;
+    if (rec) {
+      audioPlayer.src = rec;
+      audioPlayer.hidden = false;
+      audioPlayer.load();
+      $('recordingMessage').textContent = 'Recording found. Press Play to listen.';
+    } else {
+      $('recordingMessage').textContent = 'No recording URL saved yet. Check the Bolna webhook and database.';
+    }
+  }
+
+  function drawerError(error) {
+    console.error('Details error:', error);
+    $('detailsMessage').textContent = error.message || 'Could not load details';
+    $('detailsMessage').className = 'msg error';
+    $('detailTranscript').replaceChildren(el('div', { class: 'bubble plain', text: 'Transcript could not be loaded.' }));
+    $('recordingMessage').textContent = 'Recording could not be checked.';
+  }
+
+  // Invoice "Details" (same endpoint as before) + every call made on that invoice
+  async function showDetails(invoiceId) {
+    openDrawer();
+    resetDrawer('Invoice ID: ' + invoiceId);
+    try {
+      const d = await getJson('/api/invoices/' + encodeURIComponent(invoiceId) + '/details');
+      fillDetails(d, { statusLabel: badge(d.payment_status || 'pending'), sub: 'Phone: ' + (d.phone_number || 'Not available') });
+      loadInvoiceHistory(invoiceId);
+    } catch (error) { drawerError(error); }
+  }
+
+  async function loadInvoiceHistory(invoiceId) {
+    if (!state.callsConfigured) return;
+    try {
+      const data = await getJson('/api/call-logs?invoice_id=' + encodeURIComponent(invoiceId) + '&limit=50');
+      if (!data.rows || !data.rows.length) return;
+      const list = $('historyList');
+      list.replaceChildren(...data.rows.map((c) => {
+        const li = el('li', { dataset: { id: c.id }, tabindex: '0' },
+          el('div', { class: 'when' }, fmtStamp(c.called_at)),
+          badge(c.outcome && c.outcome !== 'pending' ? c.outcome : c.call_status));
+        return li;
+      }));
+      $('historyBlock').hidden = false;
+    } catch (e) { /* history is optional here */ }
+  }
+
+  // A single call from Supabase (older calls keep their own transcript & recording)
+  async function showCall(id) {
+    openDrawer();
+    resetDrawer('Loading call...');
+    try {
+      const d = await getJson('/api/call-logs/' + encodeURIComponent(id));
+      fillDetails(d, { statusLabel: badge(d.outcome && d.outcome !== 'pending' ? d.outcome : d.call_status), sub: (d.phone_number || '') + (d.called_at ? ' · ' + fmtStamp(d.called_at) : '') });
+      if (d.invoice_id != null) loadInvoiceHistory(d.invoice_id);
+    } catch (error) { drawerError(error); }
+  }
+
+  /* ================= events ================= */
+  tbody.addEventListener('click', async (event) => {
+    const button = event.target.closest('button[data-action]');
+    if (!button) return;
+    const invoiceId = Number(button.dataset.id);
+
+    if (button.dataset.action === 'details') { await showDetails(invoiceId); return; }
+
+    if (button.dataset.action === 'call') {
+      button.disabled = true;
+      try {
+        const response = await fetch('/api/trigger-call', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ invoiceId })
+        });
+        const result = await response.json();
+        if (!response.ok) toast(result.error || 'Call request failed', true);
+        else toast('Call request accepted. Call ID: ' + (result.callId || 'not returned'));
+      } catch (error) {
+        console.error(error);
+        toast('Could not contact the server.', true);
+      } finally {
+        button.disabled = false;
+      }
+    }
+  });
+
+  callRows.addEventListener('click', (event) => {
+    const b = event.target.closest('button[data-action="view-call"]');
+    if (b) showCall(b.dataset.id);
+  });
+
+  $('historyList').addEventListener('click', (event) => {
+    const li = event.target.closest('li[data-id]');
+    if (li) showCall(li.dataset.id);
+  });
+  $('historyList').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { const li = event.target.closest('li[data-id]'); if (li) showCall(li.dataset.id); }
+  });
+
+  $('closeDetails').addEventListener('click', closeDrawer);
+  $('detailsBackdrop').addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+
+  // tabs
+  function selectTab(name) {
+    for (const t of document.querySelectorAll('.tab')) t.setAttribute('aria-selected', String(t.dataset.tab === name));
+    $('panel-invoices').hidden = name !== 'invoices';
+    $('panel-calls').hidden = name !== 'calls';
+    try { localStorage.setItem('grace-tab', name); } catch (e) {}
+    if (name === 'calls') loadCalls();
+  }
+  document.querySelector('.tabs').addEventListener('click', (e) => {
+    const t = e.target.closest('.tab'); if (t) selectTab(t.dataset.tab);
+  });
+
+  // invoice filters (instant, in the browser)
+  ['invSearch', 'invState', 'invMode', 'invStatus', 'invFrom', 'invTo'].forEach((id) => $(id).addEventListener('input', renderInvoices));
+  $('invClear').addEventListener('click', () => {
+    ['invSearch', 'invState', 'invMode', 'invStatus', 'invFrom', 'invTo'].forEach((id) => { $(id).value = ''; });
+    renderInvoices();
+  });
+
+  // call filters (searched in Supabase)
+  const reloadCalls = debounce(() => { state.calls = []; loadCalls(); });
+  callFilterIds.concat('callSort').forEach((id) => $(id).addEventListener('input', reloadCalls));
+  $('callClear').addEventListener('click', () => {
+    callFilterIds.forEach((id) => { $(id).value = ''; });
+    $('callSort').value = 'newest';
+    state.calls = [];
+    loadCalls();
+  });
+  $('loadMore').addEventListener('click', () => loadCalls({ reload: false }));
+
+  $('refreshBtn').addEventListener('click', () => refreshAll(false));
+
+  function refreshAll(live) {
+    loadInvoices();
+    loadStats();
+    if (!$('panel-calls').hidden) loadCalls({ live });
+  }
+
+  // Refresh dashboard when server sends an update
+  const socket = io();
+  socket.on('dashboard-update', () => refreshAll(true));
+  socket.on('connect', () => { $('live').classList.add('on'); $('liveText').textContent = 'Live'; });
+  socket.on('disconnect', () => { $('live').classList.remove('on'); $('liveText').textContent = 'Reconnecting…'; });
+
+  /* ================= start ================= */
+  loadInvoices();
+  loadStats();
+  let startTab = 'invoices';
+  try { startTab = localStorage.getItem('grace-tab') || 'invoices'; } catch (e) {}
+  selectTab(startTab === 'calls' ? 'calls' : 'invoices');
+</script>
+</body>
+</html>

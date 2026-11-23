@@ -1,0 +1,26 @@
+PORT=3000
+
+# Bolna (voice agent)
+BOLNA_API_KEY=bn-fb34680aabb54fd7adfb5626d34e2c3b
+BOLNA_AGENT_ID=ed488189-d1d4-4a54-ae07-4ed475e03b30
+BOLNA_FROM_NUMBER=
+WEBHOOK_TOKEN=change-me
+
+# Supabase (call history)
+SUPABASE_URL=https://nbsefhebutprvzsupaty.supabase.co
+SUPABASE_SERVICE_KEY=https://nbsefhebutprvzsupaty.supabase.co/rest/v1/
+
+# Automatic follow-ups
+AUTO_FOLLOWUP_DRY_RUN=false
+AUTO_FOLLOWUP_ENABLED=true
+
+# ---- Tally sync ----
+# PUSH mode (agent on the Tally server sends data here). Use the SAME value in tally-agent/.env.
+TALLY_SYNC_TOKEN=378d30e2c114c331b1f60252b8cc2f9a30ed38e3a62b00de
+
+# PULL mode (this app reads Tally itself over VPN/Tailscale). Leave false if you use the agent.
+TALLY_PULL_ENABLED=false
+TALLY_URL=http://localhost:9000
+TALLY_COMPANY=M/S BIOCRAFT SCIENTIFIC SYSTEMS P.LTD - (2023-24)
+TALLY_SYNC_TIMES=09:00,21:00
+TALLY_DEBIT_IS_NEGATIVE=true
