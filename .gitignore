@@ -1,0 +1,30 @@
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Local databases and customer data
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Logs
+*.log
+logs/
+
+# Private credentials
+service-account*.json
+*serviceAccount*.json
+secrets/
+credentials/
+
+# Local development files
+.DS_Store
+Thumbs.db
+.vscode/
+.firebase/

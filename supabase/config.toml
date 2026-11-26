@@ -1,0 +1,8 @@
+# Minimal Supabase CLI config for the BioCraft Edge Function. Contains NO secrets.
+# "project_id" is only a local label for the CLI; the real project is chosen by: supabase link --project-ref <ref>
+project_id = "biocraft"
+
+# Callers of this function present Firebase ID tokens / webhook tokens / Tally token, never Supabase JWTs,
+# so the platform-level JWT check must be off. Every route is protected inside supabase/functions/api/handler.mjs.
+[functions.api]
+verify_jwt = false

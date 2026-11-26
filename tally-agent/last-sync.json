@@ -1,0 +1,5 @@
+{
+  "at": "2026-11-26T10:09:15.936Z",
+  "status": "failed",
+  "error": "Could not reach Tally at http://localhost:9: bad port"
+}

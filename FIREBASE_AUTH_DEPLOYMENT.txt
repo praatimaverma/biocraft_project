@@ -1,0 +1,19 @@
+BIOCRAFT AUTHENTICATION + CLOUD RUN
+
+Changes made:
+- Added Firebase email/password sign-in UI; there is no public sign-up form. Create/disable employee accounts in Firebase Console > Authentication > Users.
+- Added Firebase Admin ID-token verification to dashboard /api routes. Existing /api/tally-sync and /api/bolna-webhook machine-to-machine endpoints retain their existing token protections.
+- Added Firebase token verification to Socket.IO connections.
+- Added Firebase Hosting rewrites for /api/** and /socket.io/** to Cloud Run service biocraft-api in asia-south1.
+- Added Dockerfile and firebase-admin dependency for Cloud Run.
+- Copied the existing dashboard into public/ for Firebase Hosting.
+
+Before deploying:
+1. In Firebase Console > Authentication > Sign-in method, enable Email/Password. The screenshot previously supplied showed Users, not this provider setting.
+2. Cloud Run service must be deployed as biocraft-api in asia-south1 using this Dockerfile. Use the same Firebase project biocraft-af718. Cloud Run's runtime service account must have permission to verify Firebase users (Firebase Authentication Admin role).
+3. Configure existing server environment variables in Cloud Run securely (Supabase URL/service key, Bolna keys/agent ID, WEBHOOK_TOKEN, TALLY_SYNC_TOKEN and any existing scheduler settings). Do not put secrets in this ZIP.
+4. Configure the existing Tally agent to send to the Cloud Run URL, not localhost.
+5. IMPORTANT: Cloud Run's local filesystem is ephemeral. This app uses SQLite as a working mirror/cache. Confirm invoice refresh from Supabase and call-history persistence before relying on Cloud Run; do not treat local SQLite data as durable.
+6. Deploy Cloud Run first, then run: firebase deploy --only hosting
+
+No existing invoice, Bolna, Tally, Supabase, or dashboard business logic was intentionally rewritten.

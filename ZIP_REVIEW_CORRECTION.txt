@@ -1,0 +1,16 @@
+ZIP REVIEW CORRECTION
+====================
+
+The supplied archive's root firebase.json did not match its own CHANGE_REPORT.md:
+it still contained the old /api/** rewrite to Firebase Cloud Functions and a
+Firebase Functions deployment block. The file in original_backup/firebase.json
+is retained unchanged as the rollback copy.
+
+The root firebase.json has been corrected in this review copy to keep Firebase
+Hosting static-only (public directory and ignore list) with no Cloud Functions
+rewrite or functions deployment block. This is required for the stated
+Supabase Edge Function architecture and avoids accidentally retaining the
+old Blaze-dependent backend route.
+
+No database files, SQL migrations, invoice data, authentication code, Bolna
+logic, Tally logic, or frontend code were changed by this correction.
